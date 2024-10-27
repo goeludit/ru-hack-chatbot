@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f7f7f7; }
+        .chat-container { width: 400px; max-width: 90%; }
+        .messages { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; background-color: #fff; margin-bottom: 10px; }
+        .user-message, .bot-message { margin: 5px 0; padding: 8px 12px; border-radius: 5px; }
+        .user-message { background-color: #e1f5fe; text-align: right; }
+        .bot-message { background-color: #e0e0e0; text-align: left; }
+        .input-container { display: flex; align-items: center; }
+        input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; border: none; background-color: #007bff; color: white; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .upload-icon { margin-right: 10px; cursor: pointer; font-size: 18px; color: #007bff; }
+        .upload-icon:hover { color: #0056b3; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="messages" id="messages"></div>
+    <div class="input-container">
+        <!-- Hidden file input for selecting PDF, triggered by the paperclip icon -->
+        <label class="upload-icon" title="Upload PDF">
+            📎 <!-- Paperclip icon -->
+            <input type="file" id="pdfFile" accept="application/pdf" class="hidden" onchange="uploadPDF()">
+        </label>
+        <input type="text" id="userInput" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        const userInput = document.getElementById("userInput").value;
+        if (userInput.trim() === "") return;
+
+        appendMessage("user-message", userInput);
+
+        fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: userInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendMessage("bot-message", data.response);
+
+            // Check for prompts to show additional input fields
+            if (data.response.toLowerCase().includes("choose a doctor")) {
+                showDoctorSelection();
+            } else if (data.response.toLowerCase().includes("specify a date and time")) {
+                showTimeSelection();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+
+        document.getElementById("userInput").value = "";
+    }
+
+    function appendMessage(className, message) {
+        const messagesDiv = document.getElementById("messages");
+        const messageDiv = document.createElement("div");
+        messageDiv.className = className;
+        messageDiv.textContent = message;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Show dropdown for doctor selection in the chat
+    function showDoctorSelection() {
+        const messagesDiv = document.getElementById("messages");
+
+        const formDiv = document.createElement("div");
+        formDiv.className = "bot-message";
+        
+        formDiv.innerHTML = `
+            <label for="doctor">Choose a Doctor:</label>
+            <select id="doctor">
+                <option value="Dr. Smith">Dr. Smith</option>
+                <option value="Dr. Lee">Dr. Lee</option>
+            </select>
+            <button onclick="submitDoctorChoice()">Submit</button>
+        `;
+
+        messagesDiv.appendChild(formDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function submitDoctorChoice() {
+        const doctor = document.getElementById("doctor").value;
+        appendMessage("user-message", doctor);
+
+        fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: doctor })
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendMessage("bot-message", data.response);
+
+            // Proceed to time selection if prompted
+            if (data.response.toLowerCase().includes("specify a date and time")) {
+                showTimeSelection();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    // Show date and time input in the chat
+    function showTimeSelection() {
+        const messagesDiv = document.getElementById("messages");
+
+        const formDiv = document.createElement("div");
+        formDiv.className = "bot-message";
+
+        formDiv.innerHTML = `
+            <label for="time">Choose a Time:</label>
+            <input type="datetime-local" id="time" required>
+            <button onclick="submitTimeChoice()">Submit</button>
+        `;
+
+        messagesDiv.appendChild(formDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function submitTimeChoice() {
+        const time = document.getElementById("time").value;
+        appendMessage("user-message", time);
+
+        fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: time })
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendMessage("bot-message", data.response);
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    // Function to handle PDF upload
+    function uploadPDF() {
+        const pdfFile = document.getElementById("pdfFile").files[0];
+        if (!pdfFile) {
+            alert("Please select a PDF file to upload.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", pdfFile);
+
+        fetch("/upload_pdf", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendMessage("bot-message", data.message);
+        })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+
+</body>
+</html>
