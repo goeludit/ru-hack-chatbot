@@ -1,1 +1,1 @@
-# ru-hack-chatbot
+# ru-hack-chatbot (SangOne Chatbot)
