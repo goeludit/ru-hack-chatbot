@@ -5,24 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f7f7f7; }
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #faf7ef; }
         .chat-container { width: 400px; max-width: 90%; }
         .messages { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; background-color: #fff; margin-bottom: 10px; }
-        .user-message, .bot-message { margin: 5px 0; padding: 8px 12px; border-radius: 5px; }
-        .user-message { background-color: #e1f5fe; text-align: right; }
-        .bot-message { background-color: #e0e0e0; text-align: left; }
+        /* .user-message, .bot-message { display: inline-block; word-wrap: break-word; ;margin: 5px 0; padding: 8px 12px; border-radius: 5px; } */
+        .user-message, .bot-message { display: block; word-wrap: break-word; margin: 5px 0; padding: 8px 12px; border-radius: 5px; max-width: fit-content; }
+        
+        .user-message { background-color: #b6af6f; text-align: right; color:#faf7ef;margin-left: auto; 
+            margin-right: 0;}
+        .bot-message { background-color: #c25660; text-align: left; color:#faf7ef;}
         .input-container { display: flex; align-items: center; }
         input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; border: none; background-color: #007bff; color: white; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        .upload-icon { margin-right: 10px; cursor: pointer; font-size: 18px; color: #007bff; }
-        .upload-icon:hover { color: #0056b3; }
-        .hidden { display: none; }
+        button {margin-left: 10px; padding: 10px 20px; border: none; background-color: #c25660; color: white; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #c25660; }
+        .upload-icon { margin-right: 10px; cursor: pointer; font-size: 18px; color: #c25660; }
+        .upload-icon:hover { color: #c25660; }
+        .hidden { display: none;}
+        @font-face {
+            font-family: 'Cormorant Garamond';
+            src: url('/static/assets/CormorantGaramond-Medium.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Arial, sans-serif;
+        }
+
+    
+
     </style>
 </head>
 <body>
 
 <div class="chat-container">
+    <div class="top-logo">
+        <img src="/static/assets/sangone-logo.png" alt="Sangone Logo" style="width: 400px;">
+    </div>  
     <div class="messages" id="messages"></div>
     <div class="input-container">
         <!-- Hidden file input for selecting PDF, triggered by the paperclip icon -->
