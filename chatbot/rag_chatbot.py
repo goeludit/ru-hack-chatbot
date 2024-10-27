@@ -10,13 +10,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 import os
 
-# load_dotenv()
+load_dotenv()
 
 # Now you can access the API key
-# api_key = os.getenv("OPENAPI_KEY")
-# openai.api_key = api_key
+api_key = os.getenv("OPENAPI_KEY")
+openai.api_key = api_key
 
-openai.api_key ='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'
 # Documents dictionary for example purposes
 # Replace with your actual documents, e.g., loaded from files or database
 documents = {
