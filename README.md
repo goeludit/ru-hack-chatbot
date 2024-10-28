@@ -59,7 +59,7 @@ python app.py  # OR python3 app.py
 **Note:** This application requires an OpenAI API secret key for chatbot functionality, which may need renewal over time.
 
 
-##AWS Deployment
+## AWS Deployment
 
 ```bash
 
